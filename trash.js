@@ -21,7 +21,9 @@ program.option('-l, --list', '列出回收站文件');
 // `-c, --clear`选项表示清空回收站
 program.option('-c, --clear', '清空回收站');
 // `-d, --delete <file|directory>`选项表示删除回收站的指定文件
-program.option('-d, --delete <file|directory>', '删除回收站指定文件或目录')
+program.option('-d, --delete <file|directory>', '删除回收站指定文件或目录');
+// `--restore <file|directory>`选项表示还原回收站的指定文件
+program.option('--restore <file|directory>', '还原回收站指定文件或目录');
 
 program.parse();
 
@@ -109,6 +111,33 @@ if (options.delete) {
     }
     // 删除info目录下对应的文件
     fs.unlinkSync(deletedInfoPath + ".trashinfo");
+}
+// `restore`选项
+if (options.restore) {
+    // 获取待还原的文件名或目录名
+    var restoredFile = options.restore;
+    // 获取待还原文件在files和info下的绝对路径
+    var restoredFilePath = path.join(trashPath, restoredFile);
+    var restoredInfoPath = path.join(infoPath, restoredFile + ".trashinfo");
+    // 进行还原
+    var info = ini.parse(fs.readFileSync(restoredInfoPath).toString());
+    var originPath = info['Trash Info'].Path;// 文件原来的路径
+    if (fs.existsSync(restoredFilePath)) {
+        var stat = fs.statSync(restoredFilePath);
+        if (stat.isFile()) {
+            // 复制文件
+            var data = fs.readFileSync(restoredFilePath);
+            fs.writeFileSync(originPath, data);
+            // 删除回收站中的文件
+            fs.unlinkSync(restoredFilePath);
+        } else if (stat.isDirectory()) {
+            copyDirectory(restoredFilePath, originPath);
+        }
+    }
+    // 还原后删除在files和info目录下的文件
+    if (fs.existsSync(restoredInfoPath)) {
+        fs.unlinkSync(restoredInfoPath);
+    }
 }
 
 /**
