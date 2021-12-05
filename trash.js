@@ -14,12 +14,14 @@ var config = require('config');
 var ini = require('ini');
 
 // 设置选项
-// `-r, --remove <file>`选项表示将指定或目录移到回收站
+// `-r, --remove <file|directory>`选项表示将指定或目录移到回收站
 program.option('-r, --remove <file|directory>', '将指定文件或目录移到回收站');
 // `-l, --list`选项表示列出回收站文件
 program.option('-l, --list', '列出回收站文件');
 // `-c, --clear`选项表示清空回收站
 program.option('-c, --clear', '清空回收站');
+// `-d, --delete <file|directory>`选项表示删除回收站的指定文件
+program.option('-d, --delete <file|directory>', '删除回收站指定文件或目录')
 
 program.parse();
 
@@ -91,6 +93,24 @@ if (options.clear) {
     delDirectory(trashPath);
     // 删除info目录下所有文件
     delDirectory(infoPath);
+}
+// `delete`选项
+if (options.delete) {
+    // 回收站待删除文件或目录的名字
+    var deletedFileName = options.delete;
+    var deletedFilePath = path.join(trashPath, deletedFileName);// 在files目录下该文件的绝对路径
+    var deletedInfoPath = path.join(infoPath, deletedFileName);// 在info目录下记录该文件信息的文件绝对路径
+    // 删除files目录下对应的文件
+    if (fs.existsSync(deletedFilePath)) {
+        var stat = fs.statSync(deletedFilePath);
+        if (stat.isFile()) {
+            fs.unlinkSync(deletedFilePath);
+        } else if (stat.isDirectory()) {
+            delDirectory(deletedFilePath);
+        }
+    }
+    // 删除info目录下对应的文件
+    fs.unlinkSync(deletedInfoPath + ".trashinfo");
 }
 
 /**
