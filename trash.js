@@ -85,7 +85,12 @@ if (options.list) {
         // 提取Path和DeletionDate属性值
         list.push({DeletionDate: info['Trash Info'].DeletionDate, Path: info['Trash Info'].Path});
     });
-    console.table(list);
+    if (list.length === 0) {
+        // 如果回收站为空则不显示
+        console.log();
+    } else {
+        console.table(list);
+    }
 }
 // `clear`选项
 if (options.clear) {
@@ -93,6 +98,9 @@ if (options.clear) {
     delDirectory(trashPath);
     // 删除info目录下所有文件
     delDirectory(infoPath);
+    // 此时已经删除掉了files目录和info目录，重新创建
+    fs.mkdirSync(trashPath);
+    fs.mkdirSync(infoPath);
 }
 // `delete`选项
 if (options.delete) {

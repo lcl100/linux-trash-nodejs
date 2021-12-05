@@ -20,5 +20,5 @@ Options:
 
 ## Bug
 - ~~当文件名（不包括后缀）和目录名同名时，没有保存到`.trashinfo`文件中，因为同名冲突~~。
-- 当清空回收站时会删除掉files和info目录，导致`-l`选项显示的表格内容不正确。
+- ~~当清空回收站时会删除掉files和info目录，导致`-l`选项显示的表格内容不正确。~~
 - ~~不能删除info对应的`.trashinfo`文件，因为前面将文件如`hello.txt`移到回收站，应该在info下创建一个名为`hello.txt.trashinfo`的文件而不是`hello.trashinfo`文件，所以无法正确删除~~。
