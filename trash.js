@@ -10,10 +10,14 @@ var fs = require('fs');
 var path = require('path');
 // 导入config模块
 var config = require('config');
+// 导入init模块
+var ini = require('ini');
 
 // 设置选项
-// `-r, --remove <file>`选项表示将指定
+// `-r, --remove <file>`选项表示将指定或目录移到回收站
 program.option('-r, --remove <file|directory>', '将指定文件或目录移到回收站');
+// `-l, --list`选项表示列出回收站文件
+program.option('-l, --list', '列出回收站文件');
 
 program.parse();
 
@@ -61,6 +65,23 @@ if (options.remove) {
     } else {
         console.log('路径不存在: ' + deletedFilePath);
     }
+}
+// `list`选项
+if (options.list) {
+    // 获取回收站info目录下的文件名数组
+    var names = fs.readdirSync(infoPath);
+    // 处理成绝对路径
+    names = names.map(name => {
+        return path.join(infoPath, name);
+    });
+    var list = [];
+    names.forEach((path, index) => {
+        // 使用ini模块读取日志文件.trashinfo的内容
+        var info = ini.parse(fs.readFileSync(path).toString());
+        // 提取Path和DeletionDate属性值
+        list.push({DeletionDate: info['Trash Info'].DeletionDate, Path: info['Trash Info'].Path});
+    });
+    console.table(list);
 }
 
 /**
