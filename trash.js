@@ -42,8 +42,7 @@ var options = program.opts();
 // `remove`选项
 if (options.remove) {
     var currentPath = process.cwd();// 获取当前执行命令所在的路径
-    var deletedFile = options.remove;// 待删除文件名
-    var deletedFileName = deletedFile.substring(0, deletedFile.indexOf('.'));// 待删除文件名但不包括后缀
+    var deletedFile = options.remove;// 待删除文件名（包括后缀）或目录名
     var deletedFilePath = path.join(currentPath, deletedFile);// 待删除文件的绝对路径
     var trashFilePath = path.join(trashPath, deletedFile);// 要将该文件保存到回收站的绝对路径
     if (fs.existsSync(deletedFilePath)) {
@@ -51,7 +50,6 @@ if (options.remove) {
         var isDir = fs.lstatSync(deletedFilePath).isDirectory();
         if (isDir) {// 将目录及其目录下所有文件移到回收站
             copyDirectory(deletedFilePath, path.join(trashPath, deletedFile));
-            deletedFileName = deletedFile;// 目录没有后缀名，所以保持原有名字
         } else {// 将文件移到回收站
             // 将文件剪切到回收站files目录下
             var rs = fs.createReadStream(deletedFilePath);
@@ -65,7 +63,7 @@ if (options.remove) {
         var date = new Date();
         var time = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDay() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
         trashInfo += "DeletionDate=" + time + "\n";
-        fs.writeFileSync(path.join(infoPath, deletedFileName + '.trashinfo'), trashInfo);
+        fs.writeFileSync(path.join(infoPath, deletedFile + '.trashinfo'), trashInfo);
     } else {
         console.log('路径不存在: ' + deletedFilePath);
     }
