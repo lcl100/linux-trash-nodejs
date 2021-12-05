@@ -1,4 +1,4 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
 // 引入commander模块
 const {Command, Option} = require('commander');
 const program = new Command();
@@ -8,10 +8,13 @@ program.version('0.0.1', '-v, --version', '版本信息');
 var fs = require('fs');
 // 导入path模块
 var path = require('path');
-// 导入config模块
-var config = require('config');
 // 导入init模块
 var ini = require('ini');
+
+// 回收站文件的位置在配置文件中的trash字段中
+var trashConf=ini.parse(fs.readFileSync(path.join(__dirname,'/trash.conf')).toString());
+var trashPath=trashConf['base'].files;
+var infoPath=trashConf['base'].info;
 
 // 设置选项
 // `-r, --remove <file|directory>`选项表示将指定或目录移到回收站
@@ -27,9 +30,6 @@ program.option('--restore <file|directory>', '还原回收站指定文件或目�
 
 program.parse();
 
-// 回收站文件的位置在配置文件中的trash字段中
-var trashPath = config.get('files');// 回收站存放文件的目录
-var infoPath = config.get('info');// 回收站存放文件删除信息的目录
 // 如果回收站目录不存在则进行创建
 if (!fs.existsSync(trashPath)) {
     fs.mkdirSync(trashPath, {recursive: true});
