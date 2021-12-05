@@ -3,8 +3,17 @@
 ## 概述
 Linux系统上的回收站。
 
+## 安装
+1. 前往[linux-trash-nodejs](https://github.com/lcl100/linux-trash-nodejs/releases/)下载`.tar.gz`压缩包
+2. 将`.tar.gz`压缩包上传到Linux系统上
+3. 执行`tar -xvf linux-trash-nodejs-1.0.4.tar.gz`解压，注意不同压缩包版本不同
+4. 执行`cd linux-trash-nodejs-1.0.4`命令进入到linux-trash-nodejs目录下
+5. 执行`npm install`命令安装需要用到的第三方模块
+6. 执行`npm install . -g`命令全局安装
+7. 执行`export PATH=/usr/local/node.js/bin:$PATH`命令配置环境变量，注意node.js环境变量位置可通过`find / -name trash`查找
+
 ## 使用
-`node trash.js --help`
+`trash --help`
 ```bash
 Usage: trash [options]
 
