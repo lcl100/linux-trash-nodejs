@@ -18,6 +18,8 @@ var ini = require('ini');
 program.option('-r, --remove <file|directory>', '将指定文件或目录移到回收站');
 // `-l, --list`选项表示列出回收站文件
 program.option('-l, --list', '列出回收站文件');
+// `-c, --clear`选项表示清空回收站
+program.option('-c, --clear', '清空回收站');
 
 program.parse();
 
@@ -83,6 +85,13 @@ if (options.list) {
     });
     console.table(list);
 }
+// `clear`选项
+if (options.clear) {
+    // 同时删除files目录下所有文件
+    delDirectory(trashPath);
+    // 删除info目录下所有文件
+    delDirectory(infoPath);
+}
 
 /**
  * 将指定src目录下的所有文件复制（剪切）到指定目标dest目录下
@@ -112,4 +121,25 @@ function copyDirectory(src, dest) {
     });
     // 并且删除原目录
     fs.rmdirSync(src);
+}
+
+/**
+ * 删除指定目录下所有文件和目录
+ * @param dir 指定目录
+ */
+function delDirectory(dir) {
+    let files = [];
+    if (fs.existsSync(dir)) {
+        files = fs.readdirSync(dir);
+        files.forEach((file, index) => {
+            let curPath = path.join(dir, file);
+            var stat = fs.statSync(curPath);
+            if (stat.isDirectory()) {
+                delDirectory(curPath); //递归删除文件夹
+            } else if (stat.isFile()) {
+                fs.unlinkSync(curPath); //删除文件
+            }
+        });
+        fs.rmdirSync(dir);
+    }
 }
